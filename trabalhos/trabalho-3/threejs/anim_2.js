@@ -7,27 +7,27 @@ Object.assign( ThinkingAnimation.prototype, {
         //Animações de membros isolados
         var left_upper_arm_tween = this.create_rotation_tween(object_name="left_upper_arm", 
             startAngle=0, endAngle=-Math.PI/4, 
-            duration=500, pivot=[0,1.8,0]);
+            duration=300, pivot=[0,1.8,0]);
         var left_lower_arm_tween = this.create_rotation_tween(object_name="left_lower_arm", 
             startAngle=0, endAngle=Math.PI/2, 
-            duration=500, pivot=[0,1.8,0]);
+            duration=300, pivot=[0,1.8,0]);
         var left_hand_tween = this.create_rotation_tween(object_name="left_hand", 
             startAngle=0, endAngle=Math.PI/4, 
-            duration=500, pivot=[0,0.5,0]);
+            duration=300, pivot=[0,0.5,0]);
 
         var right_upper_arm_tween = this.create_rotation_tween(object_name="right_upper_arm", 
             startAngle=0, endAngle=2*Math.PI/3, 
-            duration=500, pivot=[0,2,0]);
+            duration=400, pivot=[0,2,0]);
         var right_lower_arm_tween = this.create_rotation_tween(object_name="right_lower_arm", 
             startAngle=0, endAngle=1.1*Math.PI/2, 
-            duration=500, pivot=[0,2,0]);
+            duration=400, pivot=[0,2,0]);
         var right_hand_tween = this.create_rotation_tween(object_name="right_hand", 
             startAngle=0, endAngle=Math.PI/3, 
-            duration=500, pivot=[0,1,0]);
+            duration=300, pivot=[0,1,0]);
 
         var head_tween = this.create_rotation_tween(object_name="head", 
             startAngle=0, endAngle=-Math.PI/24, 
-            duration=500, pivot=[0,-2.5,0]);
+            duration=400, pivot=[0,-2.5,0]);
 
         // Estrutura da Animação
         left_upper_arm_tween.start();
@@ -36,7 +36,7 @@ Object.assign( ThinkingAnimation.prototype, {
 
         right_upper_arm_tween.start();
         right_lower_arm_tween.start();
-        right_hand_tween.repeat(5).yoyo(true).start();
+        right_hand_tween.repeat(2).yoyo(true).start();
 
         head_tween.start();
     },

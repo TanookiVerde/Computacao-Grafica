@@ -7,20 +7,20 @@ function gen_robot()
     var head = instantiate_circle("head", 1.6, [0, 4.8, -0.05])
 
     var left_upper_arm = instantiate_rect(name="left_upper_arm", size=[1.5, 4], position=[-2.6, 0, 0]);
-    var left_lower_arm = instantiate_rect(name="left_lower_arm", size=[1, 3], position=[0, -3, 0]);
-    var left_hand = instantiate_rect(name="left_hand", size=[1.5, 0.5], position=[0, -2, 0]);
+    var left_lower_arm = instantiate_rect(name="left_lower_arm", size=[1, 3], position=[0, -3, 0.5]);
+    var left_hand = instantiate_rect(name="left_hand", size=[1.5, 0.5], position=[0, -2, 0.5]);
     
     var right_upper_arm = instantiate_rect(name="right_upper_arm", size=[1.5, 4], position=[2.6, 0, 0]);
     var right_lower_arm = instantiate_rect(name="right_lower_arm", size=[1, 3], position=[0, -3, 0]);
     var right_hand = instantiate_rect(name="right_hand", size=[1.5, 0.5], position=[0, -2, 0]);
     
-    var left_upper_leg = instantiate_rect(name="left_upper_leg", size=[1.5, 4], position=[-1, -5, 0]);  
+    var left_upper_leg = instantiate_rect(name="left_upper_leg", size=[1.5, 4], position=[-1, -5, -1]);  
     var left_lower_leg = instantiate_rect(name="left_lower_leg", size=[1, 3], position=[0, -3, 0]);  
-    var left_leg = instantiate_rect(name="left_leg", size=[1.5, 0.5], position=[0, -1.5, 0]);  
+    var left_feet = instantiate_rect(name="left_feet", size=[1.5, 0.5], position=[0, -1.5, 0]);  
     
-    var right_upper_leg = instantiate_rect(name="right_upper_leg", size=[1.5, 4], position=[1, -5, 0]);  
+    var right_upper_leg = instantiate_rect(name="right_upper_leg", size=[1.5, 4], position=[1, -5, -1]);  
     var right_lower_leg = instantiate_rect(name="right_lower_leg", size=[1, 3], position=[0, -3, 0]);  
-    var right_leg = instantiate_rect(name="right_leg", size=[1.5, 0.5], position=[0, -1.5, 0]);  
+    var right_feet = instantiate_rect(name="right_feet", size=[1.5, 0.5], position=[0, -1.5, 0]);  
     
     // Estrutura hierárquica do robo
     robot.add(torso);
@@ -33,10 +33,10 @@ function gen_robot()
                 right_lower_arm.add(right_hand);
         torso.add(left_upper_leg);
             left_upper_leg.add(left_lower_leg);
-            left_lower_leg.add(left_leg);
+            left_lower_leg.add(left_feet);
         torso.add(right_upper_leg);
             right_upper_leg.add(right_lower_leg);
-                right_lower_leg.add(right_leg);
+                right_lower_leg.add(right_feet);
 
     return robot
 }

@@ -42,8 +42,6 @@ var stats;
 var robot;
 
 
-
-
 function init() {
     // Canvas height/height 
     var width = 40;
@@ -95,16 +93,13 @@ function onWindowResize() {
 }
 
 function onDocumentKeyDown(event) {
-    // One for Hand wave, Two for your Custom Animation #2 and Three - Your Custom Animation #3
-    // For now, only works for Handwave
-    
-    console.log(event.key);
+    // One for Wave, Two for Thinking and Three for Dancing
     key = parseInt(event.key);
 
     animations = {
         1 : WaveAnimation,
         2 : ThinkingAnimation,
-        3 : Animation3,
+        3 : DancingAnimation,
     };
 
     // Reset Robot in Scene
