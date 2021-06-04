@@ -18,10 +18,26 @@
     Object.assign( ImageProcesser.prototype, {
 
         apply_kernel: function(border = 'icrop') {
-            // Method to apply kernel over image (incomplete)
-            // border: 'icrop' is for cropping image borders, 'extend' is for extending image border
-            // You may create auxiliary functions/methods if you'd like
 
+            
+            if(border == 'extend')
+                this.img = extend(this.img);    //Increase the image's size in one pixel, clamping it's borders
+
+            if(this.kernel == 'box')
+            {
+                this.img = new KernelApplier(box_filter, this.img).apply_filter();
+            }
+            else if(this.kernel == 'sobel')
+            {
+                var blurred = new KernelApplier(gaussian_filter, this.img).apply_filter();  //Apply Gaussian filter, to reduce high frequencies
+                this.img = new KernelApplier(sobel_filter, blurred).apply_filter();         //Apply Derivatives Kernel
+            }
+            else if(this.kernel == 'laplace')
+            {
+                this.img = new KernelApplier(laplace_filter, this.img).apply_filter()
+            }
+            
+            this.img = crop_borders(this.img);  //Always crop the image one pixel, after the filter application
         },
 
         apply_xform: function()  {
@@ -43,8 +59,8 @@
 
             // Loading HTML elements and saving
             var $transformed = document.getElementById('transformed');
-            $transformed.width = this.width; 
-            $transformed.height = this.height;
+            $transformed.width = this.img.shape[1]; 
+            $transformed.height = this.img.shape[0];
             nj.images.save(this.img, $transformed);
             var duration = new Date().valueOf() - start;
             document.getElementById('duration').textContent = '' + duration;
@@ -52,9 +68,90 @@
 
     } )
 
+    /* AUXILIARES */
+    class KernelApplier{
+        constructor(filter, image){
+            //Receive a function filter and the image
+            this.filter = filter;
+            this.image = image;
+        }
+        apply_filter(){
+            //Apply the function filter in the image
+            var image_output = nj.zeros(this.image.shape);
+
+            var h = this.image.shape[0]
+            var w = this.image.shape[1]
+
+            for (var x = 1; x < w-1; x++){
+                for (var y = 1; y < h-1; y++){
+                    var sub_matrix = this.image.slice([y-1, y+2],[x-1, x+2]);
+                    var filter_output = this.filter(sub_matrix);
+                    image_output.set(y, x, filter_output);
+                }
+            }
+            return image_output;
+        }
+    }
+    /* 
+    FILTERS FUNCTIONS
+    ----------
+    - Send as parameters to KernelApplier constructor
+    - Receive a 3x3 numjs.Array
+    - Returns the pixel color 
+    */
+    function box_filter(kernel_values){
+        return kernel_values.mean();
+    }
+    function laplace_filter(kernel_values){
+        var result = 0*kernel_values.get(0, 0) + 1*kernel_values.get(0, 1) + 0*kernel_values.get(0, 2)
+                    +1*kernel_values.get(1, 0) + 4*kernel_values.get(1, 1) + 1*kernel_values.get(1, 2)
+                    +0*kernel_values.get(2, 0) + 1*kernel_values.get(2, 1) + 0*kernel_values.get(2, 2);
+        return result/4;
+    }
+    function sobel_filter(kernel_values){
+        var d_x = -1*kernel_values.get(0, 0) +0*kernel_values.get(0, 1) +1*kernel_values.get(0, 2)
+                  -2*kernel_values.get(1, 0) +0*kernel_values.get(1, 1) +2*kernel_values.get(1, 2)
+                  -1*kernel_values.get(2, 0) +0*kernel_values.get(2, 1) +1*kernel_values.get(2, 2);
+
+        var d_y = +1*kernel_values.get(0, 0) +2*kernel_values.get(0, 1) +1*kernel_values.get(0, 2)
+                  +0*kernel_values.get(1, 0) +0*kernel_values.get(1, 1) +0*kernel_values.get(1, 2)
+                  -1*kernel_values.get(2, 0) -2*kernel_values.get(2, 1) -1*kernel_values.get(2, 2);
+        return d_x/8 + d_y/8;
+    }
+    function gaussian_filter(kernel_values){
+        var result = 1*kernel_values.get(0, 0) +2*kernel_values.get(0, 1) +1*kernel_values.get(0, 2)
+                    +2*kernel_values.get(1, 0) +4*kernel_values.get(1, 1) +2*kernel_values.get(1, 2)
+                    +1*kernel_values.get(2, 0) +2*kernel_values.get(2, 1) +1*kernel_values.get(2, 2);
+        return result/16;
+    }
+    /* MISC */
+    function crop_borders(image){
+        //Crop borders in one pixel
+        var h = image.shape[0]
+        var w = image.shape[1]
+        return image.slice([1,h-1],[1,w-1])
+    }
+    function extend(image){
+        //Increse image size, clamping values from borders
+        var extended = nj.zeros([image.shape[0]+2, image.shape[1]+2]);
+
+        for (var x = 0; x < extended.shape[1]; x++){
+            for (var y = 0; y < extended.shape[0]; y++){
+                var img_x = clamp(x-1, 0, image.shape[1]-1);
+                var img_y = clamp(y-1, 0, image.shape[0]-1);
+                extended.set(y, x, image.get(img_y, img_x))
+            }
+        }
+        return extended;
+    }
+    function clamp(num, min, max){
+        //Returns the closest number to num between min and max
+        var floor = Math.max(num, min);
+        var ceil = Math.min(floor, max);
+        return ceil;
+    }
 
     exports.ImageProcesser = ImageProcesser;
-    
     
 })));
 
