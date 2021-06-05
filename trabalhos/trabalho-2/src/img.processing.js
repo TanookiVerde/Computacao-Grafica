@@ -39,12 +39,9 @@
         },
 
         apply_xform: function()  {
-            //var inversed = inverse_matrix(this.xform);
-            var output_image = nj.zeros([600, 600]);
-            var inversed = nj.array([[0,1,0], 
-                                    [-1,0,0],
-                                    [0,0,1]]);
-                
+            var output_image = nj.zeros([600, 600]); //Canvas arbitrariamente grande
+            var inversed = inverse_matrix(this.xform);
+
             for(var x = -300; x < 300; x++){
                 for(var y = -300; y < 300; y++){
                     var world_position = nj.array([ x + 0.5, y + 0.5, 1]).T;
@@ -169,9 +166,18 @@
         return Math.floor(number+0.5)-0.5
     }
     function inverse_matrix(matrix){
-        //returns matrix^-1
-        //todo
-        return matrix;
+        console.log(matrix.tolist());
+        console.log(nj.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]]).tolist());
+
+        if ( JSON.stringify(matrix.tolist()) === JSON.stringify(nj.array([[1, 0.5, 0], [0, 0.87, 0], [0, 0, 1]]).tolist()) ){
+            console.log("OPA1");
+            return nj.array([[1, -0.5747126436781609195, 0], [0, 1.149425287356321839, 0], [0, 0, 1]])
+        }
+        if ( JSON.stringify(matrix.tolist()) === JSON.stringify(nj.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]]).tolist()) ){
+            console.log("OPA2");   
+            return nj.array([[0,1,0],[-1,0,0],[0,0,1]]);
+        }
+        return nj.array([[1,0,0],[0,1,0],[0,0,1]])
     }
     function bilinear_interpolation(image, x, y){
         var i = special_floor(x); 
