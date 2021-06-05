@@ -49,16 +49,10 @@
                 for(var y = -300; y < 300; y++){
                     var world_position = nj.array([ x + 0.5, y + 0.5, 1]).T;
                     var input_position = nj.dot(inversed, world_position);
-                    
-                    var i = Math.floor(input_position.get(0));
-                    var j = Math.floor(input_position.get(1));
-                    
-                    var color = -255;
-                    if (i > 0 && i < this.img.shape[0] && j > 0 && j < this.img.shape[1]){
-                        var color = this.img.get(i, j);
-                    }
-                    output_image.set(x+300, y+300, color);
 
+                    var color = bilinear_interpolation(this.img, input_position.get(0), input_position.get(1));
+
+                    output_image.set(x+300, y+300, color);
                 }
             }
 
@@ -171,44 +165,30 @@
         var ceil = Math.min(floor, max);
         return ceil;
     }
+    function special_floor(number){
+        return Math.floor(number+0.5)-0.5
+    }
     function inverse_matrix(matrix){
         //returns matrix^-1
         //todo
         return matrix;
     }
-    function get_output_shape(input_image, transformation){
-        // Inicializing from transform [0,0,1] vertex
-        var min_x = nj.dot(transformation, nj.array([0,0,1]).T).get(0); 
-        var max_x = min_x;
-        var min_y = nj.dot(transformation, nj.array([0,0,1]).T).get(1); 
-        var max_y = min_y;
+    function bilinear_interpolation(image, x, y){
+        var i = special_floor(x); 
+        var j = special_floor(y);
 
-        //Input image vertices
-        var vertices = [
-            [                   0,                   0,  1],
-            [                   0, input_image.shape[0]-1, 1],
-            [input_image.shape[1]-1,                    0, 1],
-            [input_image.shape[1]-1, input_image.shape[0]-1, 1]
-        ];
+        var a = Math.abs(x - i);
+        var b = Math.abs(y - j);
 
-        //Define bounds of output image
-        for(var i = 0; i < vertices.length; i++){
-            var transformed_vertex = nj.dot(transformation, nj.array(vertices[i]).T);
-            var x = transformed_vertex.get(0);
-            var y = transformed_vertex.get(1);
-
-            min_x = Math.min(x, min_x);
-            min_y = Math.min(y, min_y);
-            max_x = Math.max(x, max_x);
-            max_y = Math.max(y, max_y);
+        var color = 255;
+        if (i > 0 && i < image.shape[0] && j > 0 && j < image.shape[1]){
+            color = (1-a)*(1-b)*image.get(i-0.5, j-0.5) + 
+                        a*(1-b)*image.get(i+0.5, j-0.5) +
+                            a*b*image.get(i+0.5, j+0.5) +
+                        (1-a)*b*image.get(i-0.5, j+0.5);
         }
 
-        //Return boundaries for x and y
-        var bounds = nj.array([
-            [min_x, max_x],
-            [min_y, max_y]
-        ]);
-        return bounds;
+        return color;
     }
 
     exports.ImageProcesser = ImageProcesser;
