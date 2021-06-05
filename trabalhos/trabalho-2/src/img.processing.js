@@ -17,9 +17,7 @@
 
     Object.assign( ImageProcesser.prototype, {
 
-        apply_kernel: function(border = 'icrop') {
-
-            
+        apply_kernel: function(border = 'icrop') {      
             if(border == 'extend')
                 this.img = extend(this.img);    //Increase the image's size in one pixel, clamping it's borders
 
@@ -42,24 +40,29 @@
 
         apply_xform: function()  {
             //var inversed = inverse_matrix(this.xform);
+            var output_image = nj.zeros([600, 600]);
             var inversed = nj.array([[0,1,0], 
-                                     [-1,0,0],
-                                     [0,0,1]]);
-
-            for(var x = 0; x < this.img.shape[1]; x++){
-                for(var y = 0; y < this.img.shape[0]; y++){
+                                    [-1,0,0],
+                                    [0,0,1]]);
+                
+            for(var x = -300; x < 300; x++){
+                for(var y = -300; y < 300; y++){
                     var world_position = nj.array([ x + 0.5, y + 0.5, 1]).T;
                     var input_position = nj.dot(inversed, world_position);
-
-                    console.log(world_position.toString());
-                    console.log(input_position.toString());
                     
+                    var i = Math.floor(input_position.get(0));
+                    var j = Math.floor(input_position.get(1));
                     
+                    var color = -255;
+                    if (i > 0 && i < this.img.shape[0] && j > 0 && j < this.img.shape[1]){
+                        var color = this.img.get(i, j);
+                    }
+                    output_image.set(x+300, y+300, color);
 
-                    break;
                 }
-                break;
             }
+
+            this.img = output_image;
         },
 
         update: function() {
@@ -103,6 +106,7 @@
                 for (var y = 1; y < h-1; y++){
                     var sub_matrix = this.image.slice([y-1, y+2],[x-1, x+2]);
                     var filter_output = this.filter(sub_matrix);
+
                     image_output.set(y, x, filter_output);
                 }
             }
@@ -123,7 +127,7 @@
         var result = 0*kernel_values.get(0, 0) + 1*kernel_values.get(0, 1) + 0*kernel_values.get(0, 2)
                     +1*kernel_values.get(1, 0) + 4*kernel_values.get(1, 1) + 1*kernel_values.get(1, 2)
                     +0*kernel_values.get(2, 0) + 1*kernel_values.get(2, 1) + 0*kernel_values.get(2, 2);
-        return result/4;
+        return result/8;
     }
     function sobel_filter(kernel_values){
         var d_x = -1*kernel_values.get(0, 0) +0*kernel_values.get(0, 1) +1*kernel_values.get(0, 2)
@@ -171,6 +175,40 @@
         //returns matrix^-1
         //todo
         return matrix;
+    }
+    function get_output_shape(input_image, transformation){
+        // Inicializing from transform [0,0,1] vertex
+        var min_x = nj.dot(transformation, nj.array([0,0,1]).T).get(0); 
+        var max_x = min_x;
+        var min_y = nj.dot(transformation, nj.array([0,0,1]).T).get(1); 
+        var max_y = min_y;
+
+        //Input image vertices
+        var vertices = [
+            [                   0,                   0,  1],
+            [                   0, input_image.shape[0]-1, 1],
+            [input_image.shape[1]-1,                    0, 1],
+            [input_image.shape[1]-1, input_image.shape[0]-1, 1]
+        ];
+
+        //Define bounds of output image
+        for(var i = 0; i < vertices.length; i++){
+            var transformed_vertex = nj.dot(transformation, nj.array(vertices[i]).T);
+            var x = transformed_vertex.get(0);
+            var y = transformed_vertex.get(1);
+
+            min_x = Math.min(x, min_x);
+            min_y = Math.min(y, min_y);
+            max_x = Math.max(x, max_x);
+            max_y = Math.max(y, max_y);
+        }
+
+        //Return boundaries for x and y
+        var bounds = nj.array([
+            [min_x, max_x],
+            [min_y, max_y]
+        ]);
+        return bounds;
     }
 
     exports.ImageProcesser = ImageProcesser;
