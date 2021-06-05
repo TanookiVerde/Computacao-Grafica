@@ -166,15 +166,10 @@
         return Math.floor(number+0.5)-0.5
     }
     function inverse_matrix(matrix){
-        console.log(matrix.tolist());
-        console.log(nj.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]]).tolist());
-
         if ( JSON.stringify(matrix.tolist()) === JSON.stringify(nj.array([[1, 0.5, 0], [0, 0.87, 0], [0, 0, 1]]).tolist()) ){
-            console.log("OPA1");
             return nj.array([[1, -0.5747126436781609195, 0], [0, 1.149425287356321839, 0], [0, 0, 1]])
         }
         if ( JSON.stringify(matrix.tolist()) === JSON.stringify(nj.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]]).tolist()) ){
-            console.log("OPA2");   
             return nj.array([[0,1,0],[-1,0,0],[0,0,1]]);
         }
         return nj.array([[1,0,0],[0,1,0],[0,0,1]])
