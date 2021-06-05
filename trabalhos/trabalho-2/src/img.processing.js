@@ -41,8 +41,25 @@
         },
 
         apply_xform: function()  {
-            // Method to apply affine transform through inverse mapping (incomplete)
-            // You may create auxiliary functions/methods if you'd like
+            //var inversed = inverse_matrix(this.xform);
+            var inversed = nj.array([[0,1,0], 
+                                     [-1,0,0],
+                                     [0,0,1]]);
+
+            for(var x = 0; x < this.img.shape[1]; x++){
+                for(var y = 0; y < this.img.shape[0]; y++){
+                    var world_position = nj.array([ x + 0.5, y + 0.5, 1]).T;
+                    var input_position = nj.dot(inversed, world_position);
+
+                    console.log(world_position.toString());
+                    console.log(input_position.toString());
+                    
+                    
+
+                    break;
+                }
+                break;
+            }
         },
 
         update: function() {
@@ -149,6 +166,11 @@
         var floor = Math.max(num, min);
         var ceil = Math.min(floor, max);
         return ceil;
+    }
+    function inverse_matrix(matrix){
+        //returns matrix^-1
+        //todo
+        return matrix;
     }
 
     exports.ImageProcesser = ImageProcesser;
