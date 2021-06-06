@@ -166,13 +166,29 @@
         return Math.floor(number+0.5)-0.5
     }
     function inverse_matrix(matrix){
-        if ( JSON.stringify(matrix.tolist()) === JSON.stringify(nj.array([[1, 0.5, 0], [0, 0.87, 0], [0, 0, 1]]).tolist()) ){
-            return nj.array([[1, -0.5747126436781609195, 0], [0, 1.149425287356321839, 0], [0, 0, 1]])
-        }
-        if ( JSON.stringify(matrix.tolist()) === JSON.stringify(nj.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]]).tolist()) ){
-            return nj.array([[0,1,0],[-1,0,0],[0,0,1]]);
-        }
-        return nj.array([[1,0,0],[0,1,0],[0,0,1]])
+        //Baseado em: https://byjus.com/maths/inverse-of-3-by-3-matrix/
+        var determinant = det_3x3(matrix);
+        var cofactor = cofactor_3x3(matrix).T;
+        var adjugate = cofactor.T;
+        var coeff = 1/determinant;
+        var inversed = adjugate.multiply(coeff);
+
+        return inversed;
+    }
+    function det_3x3(matrix){
+        var A = nj.array([[matrix.get(1,1), matrix.get(1,2)],[matrix.get(2,1), matrix.get(2,2)]]);
+        var B = nj.array([[matrix.get(1,0), matrix.get(1,2)],[matrix.get(1,2), matrix.get(2,2)]])
+        var C = nj.array([[matrix.get(1,0), matrix.get(1,1)],[matrix.get(2,0), matrix.get(2,1)]])
+
+        return matrix.get(0,0)*det_2x2(A) - matrix.get(0,1)*det_2x2(B) - matrix.get(0,2)*det_2x2(C);
+    }
+    function det_2x2(matrix){
+        return matrix.get(0,0)*matrix.get(1,1) - matrix.get(0,1)*matrix.get(1,0);
+    }
+    function cofactor_3x3(matrix){
+        return nj.array([[ matrix.get(0,0), -matrix.get(0,1),  matrix.get(0,2)],
+                         [-matrix.get(1,0),  matrix.get(1,1), -matrix.get(1,2)],
+                         [ matrix.get(2,0), -matrix.get(2,1),  matrix.get(2,2)]]);
     }
     function bilinear_interpolation(image, x, y){
         var i = special_floor(x); 
